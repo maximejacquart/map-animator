@@ -1,0 +1,699 @@
+/* =============================================================================
+   Animation de carte — habillage de l'éditeur, charte Frenchtooth.
+
+   Charte reprise du site : fond clair, encre navy, magenta en unique couleur
+   d'action, boutons en gélule et conteneurs à angles nets. La typo du site
+   (Poppins) est le seul élément écarté, voir --sans.
+
+   Deux règles tenues partout dans ce fichier :
+   - un seul accent (--accent) pour l'action, le bleu (--accent-alt) ne sert
+     qu'au retour de survol, jamais à décorer ;
+   - deux rayons seulement : --r-pill sur ce qui se clique, --r-md sur les
+     surfaces. Rien d'autre.
+   ========================================================================== */
+
+:root {
+  /* Neutres de la charte : blanc pur pour les surfaces, lavande pour le plan
+     de travail. Les paliers restent proches, la séparation vient des filets
+     --line, pas d'un écart de valeur. */
+  --bg: #f0f0ff;
+  --panel: #ffffff;
+  --surface: #ffffff;
+  --surface-hi: #f6f6fd;
+  --line: #e3ebf4;
+  --line-hi: #cdd8e6;
+
+  --text: #14143c;
+  --muted: #6b6b8c;
+
+  /* Magenta Frenchtooth : couleur de tous les appels à l'action du site. Seule
+     couleur pleine de l'interface, réservée à ce qui déclenche un rendu. */
+  --accent: #e12175;
+  --accent-wash: rgba(225, 33, 117, .12);
+
+  /* Le magenta des aplats — bouton primaire. Seul token qui ne bouge pas d'un
+     thème à l'autre : c'est la couleur exacte de la charte, et un aplat porte
+     son propre contraste, il n'a pas besoin d'être éclairci sur fond sombre. */
+  --accent-solid: #e12175;
+
+  /* Bleu secondaire : uniquement l'état de survol des boutons, comme sur le
+     site où le fond se vide et le texte passe au bleu. */
+  --accent-alt: #0081eb;
+
+  --ok: #1f9e6b;
+  --error: #d92b4b;
+
+  /* Surfaces sans équivalent direct dans la charte, mais qui doivent basculer
+     avec le thème : survol des boutons, texte fantôme, halo et trame du plan
+     de travail, fond du cadre d'aperçu. */
+  --hover-bg: #ffffff;
+  --placeholder: #9a9ab5;
+  --faint: #8a8aa8;
+  --glow: #ffffff;
+  --dot: rgba(20, 20, 60, .07);
+  --accent-halo: rgba(225, 33, 117, .07);
+  --frame-bg: #ffffff;
+
+  /* Ombres teintées de l'encre navy, jamais du noir pur. */
+  --shadow-lift: 0 1px 2px rgba(20, 20, 60, .12);
+  --shadow-pop: 0 18px 44px -12px rgba(20, 20, 60, .18);
+  --shadow-stage: 0 40px 90px -24px rgba(20, 20, 60, .3);
+
+  --r-sm: 2px;
+  --r-md: 4px;
+  --r-pill: 9999px;
+
+  --ease: cubic-bezier(.2, .7, .3, 1);
+
+  /* Typo système, pas celle du site : Poppins tient la page d'accueil, pas un
+     panneau de réglages dense où sa chasse large et ses formes rondes rendent
+     tout mou. La charte est portée ici par la couleur et les formes. */
+  --sans: "Segoe UI Variable Text", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  --display: "Segoe UI Variable Display", "Segoe UI Semibold", var(--sans);
+  --mono: ui-monospace, "Cascadia Mono", "Segoe UI Mono", Consolas, monospace;
+
+  color-scheme: light;
+}
+
+/* -----------------------------------------------------------------------------
+   Thème sombre
+
+   Le navy #14143C de la charte, qui sert d'encre en clair, devient ici la
+   matière des surfaces ; le lavande #F0F0FF fait le chemin inverse et passe en
+   texte. Seules les couleurs bougent : ni les formes, ni les graisses.
+
+   Deux valeurs s'écartent de la charte, et seulement ici : le magenta est
+   éclairci et le bleu de survol aussi, car les teintes du site sont posées
+   pour du texte sombre sur blanc et tombent sous le seuil de lisibilité sur
+   fond navy. Les aplats (bouton primaire) gardent le magenta d'origine.
+
+   L'attribut `data-theme` est posé sur <html> par le script d'amorce de
+   `index.html`, puis par le bouton de bascule. Aucune media query ici : le
+   script lit `prefers-color-scheme` lui-même, ce qui laisse le choix manuel
+   l'emporter sans dupliquer ce bloc.
+   -------------------------------------------------------------------------- */
+
+:root[data-theme="dark"] {
+  --bg: #0d0d24;
+  --panel: #191940;
+  --surface: #14143c;
+  --surface-hi: #23234f;
+  --line: #2e2e5c;
+  --line-hi: #454577;
+
+  --text: #f0f0ff;
+  --muted: #9a9ac4;
+
+  --accent: #ee3a86;
+  --accent-wash: rgba(238, 58, 134, .16);
+  --accent-alt: #4da6ff;
+
+  --ok: #4fc79a;
+  --error: #ff6b83;
+
+  --hover-bg: #2c2c60;
+  --placeholder: #6f6f9b;
+  --faint: #7a7aa6;
+  --glow: #1c1c48;
+  --dot: rgba(240, 240, 255, .06);
+  --accent-halo: rgba(238, 58, 134, .09);
+  /* Le cadre reste clair : c'est l'image exportée, elle ne suit pas le thème. */
+  --frame-bg: #f0f0ff;
+
+  --shadow-lift: 0 1px 2px rgba(0, 0, 0, .4);
+  --shadow-pop: 0 18px 44px -12px rgba(0, 0, 0, .55);
+  --shadow-stage: 0 40px 90px -24px rgba(0, 0, 0, .7);
+
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  /* Le plan de travail n'a pas de surface à lui : ce halo magenta très dilué
+     et la trame de points empêchent le lavande de tomber en aplat mort.
+     Fixes et non interactifs, aucun repaint. */
+  background:
+    radial-gradient(ellipse 76% 64% at 50% 46%, var(--accent-halo), transparent 70%),
+    radial-gradient(ellipse 92% 76% at 50% 46%, var(--glow), transparent 72%),
+    radial-gradient(circle, var(--dot) 1px, transparent 1px),
+    var(--bg);
+  background-size: 100% 100%, 100% 100%, 24px 24px, auto;
+  color: var(--text);
+  font: 400 13.5px/1.6 var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* L'application est un bloc compact posé au centre de la fenêtre, pas une
+   interface plein écran. Les réglages sont collés à l'aperçu : passer d'un
+   format au bouton Lire ne doit pas demander de traverser l'écran. Le vide
+   autour est du vide, pas de la place à remplir. */
+body {
+  display: grid;
+  grid-auto-flow: column;
+  place-content: center;
+  align-items: center;
+  gap: 20px;
+  padding: 24px;
+  overflow: hidden;
+}
+
+/* -----------------------------------------------------------------------------
+   Panneau de réglages
+   -------------------------------------------------------------------------- */
+
+/* Tout le panneau est composé centré : une colonne étroite, des lignes courtes,
+   aucune donnée à comparer d'une ligne à l'autre. Seule exception, la liste
+   d'adresses (voir `#suggestions`), qui se balaie de haut en bas et perdrait
+   son bord d'attaque. */
+#panel {
+  display: flex;
+  flex-direction: column;
+  width: 390px;
+  max-height: 100%;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-pop);
+  overflow-y: auto;
+  scrollbar-color: var(--line-hi) transparent;
+  text-align: center;
+}
+
+/* Entête : bloc de marque, seules lignes en capitales de la page. Le bloc de
+   titre est centré sur toute la largeur ; la bascule de thème sort du flux pour
+   ne pas le décaler d'une demi-pastille. */
+.brand {
+  position: relative;
+  padding: 21px 26px 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+/* Surtitre de marque, dans le magenta de la charte. */
+.eyebrow {
+  margin: 0 0 8px;
+  font: 700 13px/1 var(--display);
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+#panel h1 {
+  margin: 0;
+  /* Titres en 700 : la graisse des titrages Frenchtooth. */
+  font: 700 20px/1.2 var(--display);
+  letter-spacing: -.01em;
+  color: var(--text);
+}
+
+/* Bascule de thème : pastille discrète, posée dans l'angle. Le pictogramme
+   affiché est celui du thème qu'on obtiendrait en cliquant, pas celui du thème
+   courant — c'est la convention de tous les commutateurs de ce type. */
+.theme {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: grid;
+  place-items: center;
+  width: 39px;
+  height: 39px;
+  padding: 0;
+  border-radius: 50%;
+  color: var(--muted);
+}
+
+.theme svg {
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.theme .to-light { display: none; }
+:root[data-theme="dark"] .theme .to-dark { display: none; }
+:root[data-theme="dark"] .theme .to-light { display: block; }
+
+.hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15.5px;
+}
+
+.fields { padding: 3px 26px 21px; }
+
+/* Étiquettes en casse normale : la hiérarchie vient de la graisse et de la
+   couleur, pas des capitales sur chaque ligne. L'étiquette et sa valeur
+   forment un seul groupe centré, au lieu d'être poussées aux deux bords. */
+label {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 10px;
+  margin: 21px 0 9px;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--text);
+}
+
+/* La valeur courante d'un réglage : chiffres en mono tabulaire, pour que la
+   largeur ne bouge pas pendant qu'on tire le curseur. */
+label span {
+  font: 500 15.5px/1 var(--mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.row { display: flex; gap: 8px; }
+
+/* --- Champ texte --- */
+
+/* Même gabarit que les boutons : padding, corps et interligne identiques, pour
+   que le champ et les gélules d'action fassent exactement la même hauteur. */
+input[type="text"] {
+  width: 100%;
+  min-width: 0;
+  padding: 12px 21px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  /* Gélule : la forme des champs et boutons de la charte. */
+  border-radius: var(--r-pill);
+  color: var(--text);
+  font: 400 16px/1.4 var(--sans);
+  text-align: center;
+  transition: border-color .16s var(--ease), box-shadow .16s var(--ease);
+}
+
+input[type="text"]::placeholder { color: var(--placeholder); }
+
+input[type="text"]:hover { border-color: var(--line-hi); }
+
+input[type="text"]:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-wash);
+}
+
+/* --- Curseur de durée --- */
+
+input[type="range"] {
+  width: 100%;
+  height: 23px;
+  margin: 0;
+  background: none;
+  appearance: none;
+  cursor: ew-resize;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 5px;
+  border-radius: var(--r-pill);
+  background: var(--line);
+}
+
+input[type="range"]::-moz-range-track {
+  height: 5px;
+  border-radius: var(--r-pill);
+  background: var(--line);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: -6.5px;
+  border: none;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: var(--shadow-lift);
+  transition: transform .16s var(--ease), box-shadow .16s var(--ease);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border: none;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: var(--shadow-lift);
+  transition: transform .16s var(--ease), box-shadow .16s var(--ease);
+}
+
+input[type="range"]:hover::-webkit-slider-thumb { transform: scale(1.12); }
+input[type="range"]:hover::-moz-range-thumb { transform: scale(1.12); }
+
+input[type="range"]:focus-visible { outline: none; }
+
+input[type="range"]:focus-visible::-webkit-slider-thumb {
+  box-shadow: var(--shadow-lift), 0 0 0 4px var(--accent-wash);
+}
+
+input[type="range"]:focus-visible::-moz-range-thumb {
+  box-shadow: var(--shadow-lift), 0 0 0 4px var(--accent-wash);
+}
+
+/* --- Boutons --- */
+
+button {
+  padding: 12px 21px;
+  background: var(--surface-hi);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  color: var(--text);
+  font: 600 16px/1.4 var(--sans);
+  cursor: pointer;
+  transition:
+    background-color .16s var(--ease),
+    border-color .16s var(--ease),
+    color .16s var(--ease),
+    transform .08s var(--ease);
+}
+
+/* Survol de la charte : le fond se vide, le texte passe au bleu secondaire. */
+button:hover:not(:disabled) {
+  background: var(--hover-bg);
+  border-color: var(--line-hi);
+  color: var(--accent-alt);
+}
+
+/* Retour tactile : l'appui enfonce, il ne change pas de couleur. */
+button:active:not(:disabled) { transform: translateY(1px); }
+
+button:disabled {
+  color: var(--muted);
+  cursor: default;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Sélecteur de format : un seul groupe, pas trois boutons indépendants. La
+   sélection se lit à l'accent et au fond, pas à un aplat magenta plein cadre. */
+.formats { flex-wrap: wrap; }
+
+.formats button {
+  flex: 1;
+  padding: 9px 5px;
+  font: 600 15.5px/1.4 var(--mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.formats button[aria-pressed="true"] {
+  background: var(--accent-wash);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* -----------------------------------------------------------------------------
+   Zone d'action
+
+   Collée aux réglages, pas plaquée en bas du panneau : le trajet entre un
+   bouton de format et « Lire » se fait au poignet.
+   -------------------------------------------------------------------------- */
+
+.actions {
+  padding: 20px 26px 23px;
+  border-top: 1px solid var(--line);
+  background: var(--panel);
+}
+
+button.primary {
+  width: 100%;
+  padding: 16px 21px;
+  background: var(--accent-solid);
+  border-color: var(--accent-solid);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+/* Inversion du site : le magenta se retire, le libellé passe au bleu. */
+button.primary:hover:not(:disabled) {
+  background: var(--hover-bg);
+  border-color: var(--line);
+  color: var(--accent-alt);
+}
+
+button.primary:disabled {
+  background: var(--surface-hi);
+  border-color: var(--line);
+  color: var(--muted);
+}
+
+#export {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.progress {
+  height: 4px;
+  margin-top: 16px;
+  background: var(--line);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+}
+
+.progress > div {
+  height: 100%;
+  width: 0;
+  background: var(--accent);
+  transition: width .12s linear;
+}
+
+/* Avancement de l'export, seule lecture technique restante. Mono tabulaire,
+   sinon la ligne danse à chaque pour-cent. Vide, la ligne ne prend pas de
+   place : hors export, le panneau se termine sur le raccourci. */
+#readout {
+  margin-top: 16px;
+  font: 400 14px/1.5 var(--mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+#readout:empty { margin: 0; }
+
+.shortcut {
+  margin: 13px 0 0;
+  font-size: 14px;
+  color: var(--faint);
+}
+
+kbd {
+  padding: 2px 9px;
+  border: 1px solid var(--line-hi);
+  border-bottom-width: 2px;
+  border-radius: var(--r-pill);
+  background: var(--surface-hi);
+  font: 500 13.5px/1.6 var(--mono);
+  color: var(--muted);
+}
+
+/* --- Ligne d'état --- */
+
+.status {
+  margin: 10px 0 0;
+  min-height: 22px;
+  font-size: 15.5px;
+  color: var(--muted);
+}
+
+.status[data-kind="error"] { color: var(--error); }
+.status[data-kind="ok"] { color: var(--ok); }
+
+/* -----------------------------------------------------------------------------
+   Autocomplétion : le monteur ne peut choisir qu'une adresse existante.
+   -------------------------------------------------------------------------- */
+
+.combo { position: relative; }
+
+/* Liste alignée à gauche, à contre-courant du reste du panneau : elle se
+   balaie de haut en bas, et centrer les entrées lui enlèverait le bord
+   d'attaque sur lequel l'œil descend. */
+#suggestions {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 5px;
+  max-height: 343px;
+  text-align: left;
+  overflow-y: auto;
+  list-style: none;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-pop);
+}
+
+#suggestions li {
+  padding: 9px 12px 10px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+}
+
+/* Sélection marquée par un liseré à gauche : plus lisible qu'un fond seul quand
+   la liste défile vite au clavier. */
+#suggestions li[aria-selected="true"] {
+  background: var(--accent-wash);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+#suggestions strong {
+  display: block;
+  font-weight: 600;
+  font-size: 17px;
+}
+
+#suggestions span {
+  display: block;
+  margin-top: 1px;
+  font-size: 15px;
+  color: var(--muted);
+}
+
+/* -----------------------------------------------------------------------------
+   Plan de travail
+   -------------------------------------------------------------------------- */
+
+/* Boîte de dimensionnement, sans habillage : ni bordure, ni fond propre. Elle
+   ne sert plus qu'à `fitFrame()`, qui la mesure pour calculer l'échelle de
+   l'aperçu. Ces deux dimensions décident donc de la taille de la carte à
+   l'écran, sans toucher au fichier exporté, rendu aux pixels de `SCENES`.
+   Carrée : les trois formats tiennent alors dans la même boîte, à la même
+   échelle (voir `PREVIEW_BASE` dans main.js). */
+#stage {
+  position: relative;
+  width: min(66vw, 880px);
+  height: min(88vh, 880px);
+  display: grid;
+  place-items: center;
+}
+
+/* Conteneur de l'aperçu. Aucune coque d'appareil, aucun repère de recadrage :
+   l'image exportée se suffit, son ombre la détache du fond. */
+#device {
+  position: relative;
+  line-height: 0;
+}
+
+/* Dimensions de sortie, sous le cadre. Le contenu est piloté par `data-device`,
+   posé par `applyFormat()`. Source de vérité des valeurs : SCENES (scene.js) —
+   à mettre à jour ici si un format y change. */
+#device::after {
+  position: absolute;
+  top: calc(100% + 18px);
+  left: 0;
+  right: 0;
+  text-align: center;
+  font: 500 11px/1 var(--mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .04em;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+#device[data-device="phone"]::after { content: "9:16  ·  1080 × 1920"; }
+#device[data-device="laptop"]::after { content: "16:9  ·  1920 × 1080"; }
+#device[data-device="tablet"]::after { content: "1:1  ·  1080 × 1080"; }
+
+/* Boîte à l'échelle affichée. Dimensions posées en JS. */
+#frame {
+  position: relative;
+  overflow: hidden;
+  background: var(--frame-bg);
+  box-shadow:
+    0 0 0 1px var(--line-hi),
+    var(--shadow-stage);
+}
+
+/* Changement de format : le cadre s'ouvre ou se referme sur la carte. Classe
+   posée par `morphFrame()` le temps du geste — jamais pendant un
+   redimensionnement de fenêtre, où le cadre doit coller au curseur. */
+#frame.morphing {
+  transition:
+    width .42s var(--ease),
+    height .42s var(--ease);
+}
+
+/* Mise au point : l'image se défocalise pendant le recadrage, puis revient.
+   Le cadre seul se lisait comme un saut, parce que la carte, elle, bascule
+   d'un champ de vision à l'autre en une frame — le flou couvre cette coupure
+   au lieu de la souligner. Purement visuel : `filter` n'entre pas dans les
+   pixels que l'export lit sur le canvas.
+
+   Seule la composition est floutée, pas la carte qui vit dessous : elle porte
+   la même image, et rester nette lui fait combler les bords que le flou rend
+   translucides. Un seul canvas traité, donc, au lieu de deux. */
+#frame.morphing #output { animation: refocus .42s var(--ease); }
+
+@keyframes refocus {
+  0% { filter: blur(0); }
+  38% { filter: blur(10px); }
+  100% { filter: blur(0); }
+}
+
+/* La composition est rendue aux dimensions EXACTES de sortie (ex. 1080x1920),
+   puis réduite en CSS. Jamais l'inverse : la capture doit être pixel-exacte. */
+#output {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+  z-index: 1;
+}
+
+/* La carte vit sous la composition, à la taille de l'écran de l'appareil.
+   Elle doit rester peinte par le navigateur pour être recopiée dans le canvas,
+   donc on la cache derrière `#output` plutôt qu'avec `display: none`. */
+#map {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+  z-index: 0;
+}
+
+/* -----------------------------------------------------------------------------
+   Fenêtre étroite : le bloc passe en colonne, l'aperçu au-dessus des réglages.
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 980px) {
+  body {
+    grid-auto-flow: row;
+    gap: 14px;
+    padding: 14px;
+  }
+
+  #panel {
+    width: 100%;
+    max-width: 572px;
+    justify-self: center;
+  }
+
+  /* L'aperçu passe devant les réglages : c'est lui qu'on regarde d'abord. */
+  #stage {
+    order: -1;
+    width: min(94vw, 580px);
+    height: min(56vh, 580px);
+    justify-self: center;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Mouvement réduit
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+  }
+}

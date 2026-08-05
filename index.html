@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#e12175" />
+    <!-- Thème posé avant le premier rendu : un module `defer` s'exécuterait
+         après la peinture du fond clair, d'où un flash blanc à l'ouverture en
+         sombre. Choix manuel prioritaire, réglage système sinon. -->
+    <script>
+      (() => {
+        const saved = localStorage.getItem('theme');
+        const system = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.dataset.theme = saved ?? system;
+      })();
+    </script>
+    <meta
+      name="description"
+      content="Générateur d'animations de carte pour les vidéos Frenchtooth : une adresse, une durée, un mp4."
+    />
+    <title>Animation de carte — Frenchtooth</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%23e12175' d='M16 3c-5 0-9 4-9 9 0 6.6 9 17 9 17s9-10.4 9-17c0-5-4-9-9-9zm0 12.2a3.2 3.2 0 1 1 0-6.4 3.2 3.2 0 0 1 0 6.4z'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <aside id="panel">
+      <header class="brand">
+        <div>
+          <p class="eyebrow">Frenchtooth</p>
+          <h1>Animation de carte</h1>
+        </div>
+        <button id="theme" class="theme" type="button" aria-label="Changer de thème">
+          <svg class="to-dark" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z" />
+          </svg>
+          <svg class="to-light" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="4.2" />
+            <path d="M12 2.6v2.2M12 19.2v2.2M4.2 12H2M22 12h-2.2M6.5 6.5 4.9 4.9M19.1 19.1l-1.6-1.6M17.5 6.5l1.6-1.6M4.9 19.1l1.6-1.6" />
+          </svg>
+        </button>
+      </header>
+
+      <div class="fields">
+        <label for="address">Adresse du cabinet</label>
+        <div class="combo">
+          <input
+            id="address"
+            type="text"
+            placeholder="Tapez, puis choisissez"
+            autocomplete="off"
+            role="combobox"
+            aria-expanded="false"
+            aria-controls="suggestions"
+          />
+          <ul id="suggestions" role="listbox" hidden></ul>
+        </div>
+        <p id="status" class="status"></p>
+
+        <label for="duration">Durée <span id="duration-value">8 s</span></label>
+        <input id="duration" type="range" min="3" max="8" step="0.5" value="8" />
+
+        <label>Format</label>
+        <div class="row formats" id="formats"></div>
+      </div>
+
+      <div class="actions">
+        <button id="play" type="button" class="primary">▶&nbsp; Lire</button>
+        <button id="export" type="button">Exporter en mp4</button>
+        <div class="progress" hidden><div id="progress"></div></div>
+
+        <p class="hint" id="readout"></p>
+        <p class="shortcut"><kbd>Espace</kbd> lit ou met en pause</p>
+      </div>
+    </aside>
+
+    <main id="stage">
+      <!-- `#device` ne dessine plus d'appareil : il ne porte que le repère de
+           recadrage et la légende de format, faits en CSS d'après `data-device`.
+           Rien de tout ça n'entre dans le fichier exporté. `#output` porte la
+           composition finale, aux dimensions exactes du fichier, réduite en CSS. -->
+      <div id="device">
+        <div id="frame">
+          <div id="map" aria-hidden="true"></div>
+          <canvas id="output"></canvas>
+        </div>
+      </div>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
